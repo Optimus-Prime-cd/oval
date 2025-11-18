@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avaturn SDK Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;
+        }
+        #avaturn-sdk-container {
+            width: 100%;
+            height: 100%;
+            /* The SDK interface will load inside this div */
+        }
+    </style>
+</head>
+<body>
+    <!-- This is the container where Avaturn will be embedded -->
+    <div id="avaturn-sdk-container"></div>
+
+    <script type="module">
+        // Loading directly from CDN
+        import { AvaturnSDK } from "https://cdn.jsdelivr.net/npm/@avaturn/sdk/dist/index.js";
+
+        function loadAvaturn() {
+            const container = document.getElementById("avaturn-sdk-container");
+            
+            // NOTE: This uses the 'demo' subdomain, which requires a Google sign-in. 
+            // A paid plan is required to change this subdomain to your own custom, anonymous one.
+            const subdomain = "demo"; 
+            const url = `https://${subdomain}.avaturn.dev`;
+
+            const sdk = new AvaturnSDK();
+            
+            sdk.init(container, { url })
+                .then(() => {
+                    console.log("Avaturn SDK Initialized.");
+
+                    // Listen for export callback (when a user clicks "Next")
+                    sdk.on("export", (data) => {
+                        console.log("[CALLBACK] Avatar export successful!");
+                        
+                        // *** THIS IS THE DATA YOU NEED ***
+                        console.log("Export Data:", data); 
+                        
+                        // The temporary GLB URL is here:
+                        console.log("GLB URL:", data.url); 
+                        
+                        alert(`Avatar exported! URL logged to console. Check console to see the URL.`);
+
+                        // In a real app, you would send 'data.url' to your backend or Flutter app here.
+
+                    });
+                })
+                .catch((error) => {
+                    console.error("Failed to initialize Avaturn SDK:", error);
+                    alert("SDK failed to load. Check console for errors. Make sure your subdomain is correct.");
+                });
+        }
+
+        // Start Avaturn when the page is fully loaded
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", loadAvaturn);
+        } else {
+            loadAvaturn();
+        }
+
+        // Make loadAvaturn available globally in case you want to trigger it manually
+        window.loadAvaturn = loadAvaturn;
+    </script>
+</body>
+</html>
