@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avatar Creator</title>
+    <style>
+        body { margin: 0; padding: 0; height: 100vh; overflow: hidden; }
+        #avaturn-sdk-container { width: 100%; height: 100%; }
+    </style>
+</head>
+<body>
+    <div id="avaturn-sdk-container"></div>
+
+    <script type="module">
+        import { AvaturnSDK } from "https://cdn.jsdelivr.net/npm/@avaturn/sdk/dist/index.js";
+
+        function loadAvaturn() {
+            const container = document.getElementById("avaturn-sdk-container");
+            const subdomain = "demo"; 
+            const url = `https://${subdomain}.avaturn.dev`;
+            const sdk = new AvaturnSDK();
+            
+            sdk.init(container, { url })
+                .then(() => {
+                    sdk.on("export", (data) => {
+                        console.log("GLB URL:", data.url);
+                        
+                        // Redirect back to your app with the URL
+                        // Replace 'yourapp' with your actual app scheme
+                        window.location.href = `yourapp://avatar?url=${encodeURIComponent(data.url)}`;
+                    });
+                })
+                .catch((error) => {
+                    console.error("Error initializing Avaturn SDK:", error);
+                });
+        }
+
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", loadAvaturn);
+        } else {
+            loadAvaturn();
+        }
+    </script>
+</body>
+</html>
